@@ -18,7 +18,8 @@ namespace Secventiator
         UInt16[] RG;
         UInt16 SBUS, DBUS, RBUS;
         UInt16[] MEM;
-        uint stare; 
+        uint stare;
+        int INTR; 
 
 
         public Form1()
@@ -49,19 +50,19 @@ namespace Secventiator
                 case 0:
                     return 0; 
                 case 1:
-                    return 1;
+                    return (IR & 0b0000110000000000)>>10 ;
                 case 2:
-                    return 2;
+                    return (IR & 0b0000110000000000)>>10;
                 case 3:
-                    return 3; 
+                    return (IR & 0b0000000000110000)>>4; 
                 case 4:
-                    return 4;
+                    return IR & (0b0111000000000000)>>12;
                 case 5:
-                    return 5;
+                    return (IR & 0b0000111100000000)>>8;
                 case 6:
-                    return 6;
+                    return IR & (0b0000111100000000)>>7;
                 case 7:
-                    return 7;
+                    return INTR<<2;
                  default:
                     return 0; 
             }
@@ -69,7 +70,7 @@ namespace Secventiator
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            MessageBox.Show(GetIndex(5).ToString());
         }
     }
 }
