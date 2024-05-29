@@ -40,7 +40,8 @@ namespace Secventiator
                     int sursaSBUS = (int)((MIR >> 32) & 0xF);       // Bits 35-32
                     int sursaDBUS = (int)((MIR >> 28) & 0xF);       // Bits 31-28
                     int operatieALU = (int)((MIR >> 24) & 0xF);     // Bits 27-24
-                    int operatieMem = (int)((MIR >> 20) & 0xF);     // Bits 23-20
+                    int destinatieRBUS = (int)((MIR >> 20) & 0xF);  // Bits 23-20
+                    int operatieMem = (int)((MIR >> 18) & 0x3);     // Bits 19-18
                     int alteOperatii = (int)((MIR >> 14) & 0xF);    // Bits 17-14
                     int succesor = (int)((MIR >> 11) & 0x7);        // Bits 13-11
                     int index = (int)((MIR >> 8) & 0x7);            // Bits 10-8
@@ -66,9 +67,23 @@ namespace Secventiator
                         case (int)Secventiator.SBUS.PdIVR: SBUS = IVR; break;
                         case (int)Secventiator.SBUS.PdADR: SBUS = ADR; break;
                         case (int)Secventiator.SBUS.PdMDR: SBUS = MDR; break;
-                        case (int)Secventiator.SBUS.PdIR: SBUS = IR; break;
+                        case (int)Secventiator.SBUS.PdIR: SBUS = (ushort)(IR & 0x00FF); break;
                         case (int)Secventiator.SBUS.Pd0: SBUS = 0; break;
                         case (int)Secventiator.SBUS.PdMinus1: SBUS = 0xFF; break;
+                    }
+
+                    switch (destinatieRBUS)
+                    {
+                        case (int)Secventiator.RBUS.NONE: break;
+                        case (int)Secventiator.RBUS.PmFLAG: FLAGS = RBUS; break;
+                        case (int)Secventiator.RBUS.PmFLAG3: FLAGS = (ushort)(FLAGS & (RBUS & 0x3)); break;
+                        case (int)Secventiator.RBUS.PmRG: RG[IR & 0xF] = RBUS; break;
+                        case (int)Secventiator.RBUS.PmSP: SP = RBUS; break;
+                        case (int)Secventiator.RBUS.PmT: T = RBUS; break;
+                        case (int)Secventiator.RBUS.PmPC: PC = RBUS; break;
+                        case (int)Secventiator.RBUS.PmIVR: IVR = RBUS; break;
+                        case (int)Secventiator.RBUS.PmADR: ADR = RBUS; break;
+                        case (int)Secventiator.RBUS.PmMDR: MDR = RBUS; break;
                     }
 
                     switch (alteOperatii)
