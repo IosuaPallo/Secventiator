@@ -54,6 +54,25 @@ namespace Secventiator
                     int s = (FLAGS >> 1) & 1;   // bit 1
                     int v = FLAGS & 1;          // bit 0
 
+                    switch (sursaDBUS)
+                    {
+                        case (int)Secventiator.DBUS.NONE: break ;
+                        case (int)Secventiator.DBUS.PdFLAG: DBUS = FLAGS; break;
+                        case (int)Secventiator.DBUS.PdRG:DBUS = RG[IR & 0xF]; break;
+                        case (int)Secventiator.DBUS.PdSP: DBUS= SP; break;
+                        case (int)Secventiator.DBUS.PdT: DBUS = T; break;
+                        case (int)Secventiator.DBUS.PdPC: DBUS = PC; break;
+                        case (int)Secventiator.DBUS.PdIVR: DBUS =IVR; break;
+                        case (int)Secventiator.DBUS.PdADR: DBUS = ADR; break;
+                        case (int)Secventiator.DBUS.PdMDR: DBUS = MDR; break;
+                        case (int)Secventiator.DBUS.PdMDRN: DBUS = MDR; break;
+                        case (int)Secventiator.DBUS.PdIR: DBUS = IR; break;
+                        case (int)Secventiator.DBUS.Pd0: DBUS = 0xFF; break;
+                        case (int)Secventiator.DBUS.PdMinus1: DBUS = 0xFF; break ;
+
+                    }
+
+
                     switch (alteOperatii)
                     {
                         case (int)OTHERS.A1BE0: aclow = 1; break;
@@ -100,8 +119,8 @@ namespace Secventiator
         }
 
         private int GetIndex(int index) {
-            int cl1 = IR >> 15 & (IR & 0b0100000000000000) >>14;
-            int cl0 = IR >> 15 & ~((IR & 0b0010000000000000) >> 13);
+            int cl1 = IR >> 15 & (IR & 0b0100000000000000) >>14; //IR15 & IR14
+            int cl0 = IR >> 15 & ~((IR & 0b0010000000000000) >> 13); // IR15& ~IR13
             int index1 = cl1 << 1;
             index1 = index1 + cl0;
             switch(index)
@@ -110,7 +129,7 @@ namespace Secventiator
                     return 0;
                 case 1: return index1;
                 case 2:
-                    return (IR & 0b0000110000000000)>>10;
+                    return (IR & 0b0000110000000000)>>10; // 
                 case 3:
                     return (IR & 0b0000000000110000)>>4; 
                 case 4:
