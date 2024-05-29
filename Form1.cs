@@ -54,6 +54,23 @@ namespace Secventiator
                     int s = (FLAGS >> 1) & 1;   // bit 1
                     int v = FLAGS & 1;          // bit 0
 
+                    switch (sursaSBUS)
+                    {
+                        case (int)Secventiator.SBUS.NONE: break;
+                        case (int)Secventiator.SBUS.PdFLAG: SBUS = FLAGS;  break;
+                        case (int)Secventiator.SBUS.PdRG: SBUS = RG[(IR>>6) & 0xF]; break;
+                        case (int)Secventiator.SBUS.PdSP: SBUS = SP; break;
+                        case (int)Secventiator.SBUS.PdT: SBUS = T;  break;
+                        case (int)Secventiator.SBUS.PdTN: SBUS = (ushort)~T; break;
+                        case (int)Secventiator.SBUS.PdPC: SBUS = PC; break;
+                        case (int)Secventiator.SBUS.PdIVR: SBUS = IVR; break;
+                        case (int)Secventiator.SBUS.PdADR: SBUS = ADR; break;
+                        case (int)Secventiator.SBUS.PdMDR: SBUS = MDR; break;
+                        case (int)Secventiator.SBUS.PdIR: SBUS = IR; break;
+                        case (int)Secventiator.SBUS.Pd0: SBUS = 0; break;
+                        case (int)Secventiator.SBUS.PdMinus1: SBUS = 0xFF; break;
+                    }
+
                     switch (alteOperatii)
                     {
                         case (int)OTHERS.A1BE0: aclow = 1; break;
