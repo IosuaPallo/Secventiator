@@ -45,22 +45,25 @@ namespace Secventiator
         }
 
         private int GetIndex(int index) {
+            int cl1 = IR >> 15 & (IR & 0b0100000000000000) >>14;
+            int cl0 = IR >> 15 & ~((IR & 0b0010000000000000) >> 13);
+            int index1 = cl1 << 1;
+            index1 = index1 + cl0;
             switch(index)
             {
                 case 0:
-                    return 0; 
-                case 1:
-                    return (IR & 0b0000110000000000)>>10 ;
+                    return 0;
+                case 1: return index1;
                 case 2:
                     return (IR & 0b0000110000000000)>>10;
                 case 3:
                     return (IR & 0b0000000000110000)>>4; 
                 case 4:
-                    return IR & (0b0111000000000000)>>12;
+                    return (IR & 0b0111000000000000)>>12;
                 case 5:
                     return (IR & 0b0000111100000000)>>8;
                 case 6:
-                    return IR & (0b0000111100000000)>>7;
+                    return (IR & 0b0000111100000000)>>7;
                 case 7:
                     return INTR<<2;
                  default:
@@ -70,7 +73,8 @@ namespace Secventiator
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            MessageBox.Show(GetIndex(5).ToString());
+            IR = 0b1110000000000000;
+            MessageBox.Show(GetIndex(1).ToString());
         }
     }
 }
