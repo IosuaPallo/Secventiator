@@ -54,6 +54,7 @@ namespace Secventiator
                     int s = (FLAGS >> 1) & 1;   // bit 1
                     int v = FLAGS & 1;          // bit 0
 
+
                     switch (sursaDBUS)
                     {
                         case (int)Secventiator.DBUS.NONE: break ;
@@ -66,7 +67,7 @@ namespace Secventiator
                         case (int)Secventiator.DBUS.PdADR: DBUS = ADR; break;
                         case (int)Secventiator.DBUS.PdMDR: DBUS = MDR; break;
                         case (int)Secventiator.DBUS.PdMDRN: DBUS = (ushort)~MDR; break;
-                        case (int)Secventiator.DBUS.PdIR: DBUS = IR; break;
+                        case (int)Secventiator.DBUS.PdIR: DBUS = (ushort)(IR & 0x00FF) ; break;
                         case (int)Secventiator.DBUS.Pd0: DBUS = 0xFF; break;
                         case (int)Secventiator.DBUS.PdMinus1: DBUS = 0xFF; break ;
 
