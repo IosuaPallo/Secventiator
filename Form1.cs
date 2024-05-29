@@ -65,7 +65,7 @@ namespace Secventiator
                         case (int)Secventiator.DBUS.PdIVR: DBUS =IVR; break;
                         case (int)Secventiator.DBUS.PdADR: DBUS = ADR; break;
                         case (int)Secventiator.DBUS.PdMDR: DBUS = MDR; break;
-                        case (int)Secventiator.DBUS.PdMDRN: DBUS = MDR; break;
+                        case (int)Secventiator.DBUS.PdMDRN: DBUS = (ushort)~MDR; break;
                         case (int)Secventiator.DBUS.PdIR: DBUS = IR; break;
                         case (int)Secventiator.DBUS.Pd0: DBUS = 0xFF; break;
                         case (int)Secventiator.DBUS.PdMinus1: DBUS = 0xFF; break ;
