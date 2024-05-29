@@ -57,9 +57,9 @@ namespace Secventiator
                     switch (operatieMem)
                     {
                         case (int)Secventiator.MEM.NONE: break;
-                        case (int)Secventiator.MEM.IFCH: break;
-                        case (int)Secventiator.MEM.RD: break;
-                        case (int)Secventiator.MEM.WR: break;
+                        case (int)Secventiator.MEM.IFCH: IR = MEM[ADR]; break;
+                        case (int)Secventiator.MEM.RD: MDR = MEM[ADR]; break;
+                        case (int)Secventiator.MEM.WR: MEM[ADR] = MDR; break;
                     }
 
                     switch (alteOperatii)
