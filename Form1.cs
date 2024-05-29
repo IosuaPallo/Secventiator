@@ -54,6 +54,14 @@ namespace Secventiator
                     int s = (FLAGS >> 1) & 1;   // bit 1
                     int v = FLAGS & 1;          // bit 0
 
+                    switch (operatieMem)
+                    {
+                        case (int)Secventiator.MEM.NONE: break;
+                        case (int)Secventiator.MEM.IFCH: break;
+                        case (int)Secventiator.MEM.RD: break;
+                        case (int)Secventiator.MEM.WR: break;
+                    }
+
                     switch (alteOperatii)
                     {
                         case (int)OTHERS.A1BE0: aclow = 1; break;
