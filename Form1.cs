@@ -34,6 +34,8 @@ namespace Secventiator
                     stare = 1;
                     break;
                 case 1:
+
+
                     int sursaSBUS = (int)((MIR >> 32) & 0xF);       // Bits 35-32
                     int sursaDBUS = (int)((MIR >> 28) & 0xF);       // Bits 31-28
                     int operatieALU = (int)((MIR >> 24) & 0xF);     // Bits 27-24
@@ -130,9 +132,7 @@ namespace Secventiator
                         case (int)ALU.OR: RBUS = (UInt16)(SBUS | DBUS); break;
                         case (int)ALU.XOR: RBUS = (UInt16)(SBUS ^ DBUS); break;
                         case (int)ALU.ASL: RBUS = (UInt16)(SBUS >> DBUS); break;
-                        case (int)ALU.ASR:
-                            RBUS = (UInt16)(SBUS << DBUS); break;
-                            RBUS = SBUS;
+                        case (int)ALU.ASR: RBUS = (UInt16)(SBUS << DBUS); break;
                         case (int)ALU.LSR:
                             int x = DBUS;
                             while (x > 0)
@@ -180,9 +180,9 @@ namespace Secventiator
                     switch (alteOperatii)
                     {
                         case (int)OTHERS.NONE: break;
-                        case (int)OTHERS.PLUS2SP: SP = (ushort)(SP + 2); break;
-                        case (int)OTHERS.MIN2SP: SP = SP - 2; break;
-                        case (int)OTHERS.PLUS2PC: PC = PC + 2; break;
+                        case (int)OTHERS.PLUS2SP: SP = (UInt16)(SP + 2); break;
+                        case (int)OTHERS.MIN2SP: SP =(UInt16)(SP - 2); break;
+                        case (int)OTHERS.PLUS2PC: PC = (UInt16)(PC + 2); break;
                         case (int)OTHERS.PdCONDa:
                             FLAGS |= (ushort)(cALU << 3);
                             FLAGS |= (ushort)(zALU << 2);
@@ -202,9 +202,10 @@ namespace Secventiator
                             break;
                         case (int)OTHERS.A1BVI: bvi = (ushort)1; break;
                         case (int)OTHERS.A0BVI: bvi = 0; break;
-                        case (int)OTHERS.INTAMIN2SP: INTA = 1; SP = SP - 2; break;
+                        case (int)OTHERS.INTAMIN2SP: INTA = 1; SP = (UInt16)(SP - 2); break;
                         case (int)OTHERS.A0BEA0BI: aclow = 0; cil = 0; bvi = 0; break;
                     }
+                    break; 
 
                 case 2:
                     while (BUSY == 1) ;
