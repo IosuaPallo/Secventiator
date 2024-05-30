@@ -32,7 +32,7 @@ namespace Secventiator
                 case 0:
                     MIR = MPM[MAR];
                     stare = 1;
-                    break; 
+                    break;
                 case 1:
                     int sursaSBUS = (int)((MIR >> 32) & 0xF);       // Bits 35-32
                     int sursaDBUS = (int)((MIR >> 28) & 0xF);       // Bits 31-28
@@ -55,10 +55,10 @@ namespace Secventiator
                     switch (sursaSBUS)
                     {
                         case (int)Secventiator.SBUS.NONE: break;
-                        case (int)Secventiator.SBUS.PdFLAG: SBUS = FLAGS;  break;
-                        case (int)Secventiator.SBUS.PdRG: SBUS = RG[(IR>>6) & 0xF]; break;
+                        case (int)Secventiator.SBUS.PdFLAG: SBUS = FLAGS; break;
+                        case (int)Secventiator.SBUS.PdRG: SBUS = RG[(IR >> 6) & 0xF]; break;
                         case (int)Secventiator.SBUS.PdSP: SBUS = SP; break;
-                        case (int)Secventiator.SBUS.PdT: SBUS = T;  break;
+                        case (int)Secventiator.SBUS.PdT: SBUS = T; break;
                         case (int)Secventiator.SBUS.PdTN: SBUS = (ushort)~T; break;
                         case (int)Secventiator.SBUS.PdPC: SBUS = PC; break;
                         case (int)Secventiator.SBUS.PdIVR: SBUS = IVR; break;
@@ -86,13 +86,13 @@ namespace Secventiator
                     switch (alteOperatii)
                     {
                         case (int)OTHERS.A1BE0: aclow = 1; break;
-                        case (int)OTHERS.A1BE1: cil = 1;break;
+                        case (int)OTHERS.A1BE1: cil = 1; break;
                     }
 
                     switch (succesor)
                     {
                         case (int)SUCCESOR.STEP: f = NTF; g = 0; break;
-                        case (int)SUCCESOR.JUMPI: f = NTF==0?1:0; g = 1; break;
+                        case (int)SUCCESOR.JUMPI: f = NTF == 0 ? 1 : 0; g = 1; break;
                         case (int)SUCCESOR.IFACLOW: f = aclow; g = f ^ NTF; break;
                         case (int)SUCCESOR.IFCIL: f = cil; g = cil ^ NTF; break;
                         case (int)SUCCESOR.IFC: f = c; g = c ^ NTF; break;
@@ -103,14 +103,14 @@ namespace Secventiator
 
                     if (g == 1)
                     {
-                        MAR = (ulong) (microAdresaSalt + index); 
+                        MAR = (ulong)(microAdresaSalt + index);
                     }
                     else
                     {
                         MAR++;
                     }
 
-                    if(operatieMem == (int)Secventiator.MEM.NONE)
+                    if (operatieMem == (int)Secventiator.MEM.NONE)
                     {
                         stare = 0;
                     }
@@ -130,27 +130,30 @@ namespace Secventiator
                         case (int)ALU.OR: RBUS = (UInt16)(SBUS | DBUS); break;
                         case (int)ALU.XOR: RBUS = (UInt16)(SBUS ^ DBUS); break;
                         case (int)ALU.ASL: RBUS = (UInt16)(SBUS >> DBUS); break;
-                        case (int)ALU.ASR: RBUS = (UInt16)(SBUS << DBUS); break;
+                        case (int)ALU.ASR:
+                            RBUS = (UInt16)(SBUS << DBUS); break;
                             RBUS = SBUS;
-                        case (int)ALU.LSR: int x = DBUS;
-                            while (x>0)
+                        case (int)ALU.LSR:
+                            int x = DBUS;
+                            while (x > 0)
                             {
-                                RBUS= (UInt16) (RBUS >> 1);
+                                RBUS = (UInt16)(RBUS >> 1);
                                 RBUS &= 0x7FFF;
                                 x--;
                             }
                             break;
-                        case (int)ALU.ROL: RBUS = (UInt16)((UInt16) (SBUS << DBUS) | (UInt16)(SBUS >> (-DBUS & 16))); break;
+                        case (int)ALU.ROL: RBUS = (UInt16)((UInt16)(SBUS << DBUS) | (UInt16)(SBUS >> (-DBUS & 16))); break;
                         case (int)ALU.ROR: RBUS = (UInt16)((UInt16)(SBUS >> DBUS) | (UInt16)(SBUS << (-DBUS & 16))); break;
-                        case (int)ALU.RLC: 
+                        case (int)ALU.RLC:
                             int y = DBUS;
                             RBUS = SBUS;
                             while (y > 0)
                             {
-                                cALU = (RBUS & 0x8000); 
-                                RBUS = (UInt16)((SBUS <<1) | (cALU >> 15));
+                                cALU = (RBUS & 0x8000);
+                                RBUS = (UInt16)((SBUS << 1) | (cALU >> 15));
                                 y--;
-                            } break;
+                            }
+                            break;
                         case (int)ALU.RRC:
                             int w = DBUS;
                             RBUS = SBUS;
@@ -166,41 +169,42 @@ namespace Secventiator
                     {
                         zALU = 1;
                     }
-                    if(RBUS >= 0)
+                    if (RBUS >= 0)
                     {
                         sALU = 0;
                     }
-                    {
                     else
+                    {
                         sALU = 1;
                     }
-
+                    switch (alteOperatii)
+                    {
                         case (int)OTHERS.NONE: break;
-                        case (int)OTHERS.PLUS2SP: SP = SP + 2; break;
+                        case (int)OTHERS.PLUS2SP: SP = (ushort)(SP + 2); break;
                         case (int)OTHERS.MIN2SP: SP = SP - 2; break;
                         case (int)OTHERS.PLUS2PC: PC = PC + 2; break;
                         case (int)OTHERS.PdCONDa:
-                            FLAGS |= (ushort)(cALU << 3); 
-                            FLAGS |= (ushort)(zALU << 2);   
-                            FLAGS |= (ushort)(sALU << 1);  
-                            FLAGS |= (ushort)vALU; break;
-                        case (int)OTHERS.CinPdCONDa: 
-                            cIN = 1; 
                             FLAGS |= (ushort)(cALU << 3);
                             FLAGS |= (ushort)(zALU << 2);
                             FLAGS |= (ushort)(sALU << 1);
+                            FLAGS |= (ushort)vALU;
+                            break;
+                        case (int)OTHERS.CinPdCONDa:
+                            cIN = 1;
+                            FLAGS |= (ushort)(cALU << 3);
+                            FLAGS |= (ushort)(zALU << 2);
+                            FLAGS |= (ushort)(sALU << 1);
+                            break;
                         case (int)OTHERS.PdCONDl:
                             FLAGS |= (ushort)vALU; break;
                             FLAGS |= (ushort)(zALU << 2);
                             FLAGS |= (ushort)(sALU << 1);
                             break;
-                        case (int)OTHERS.A1BVI: bvi = 1; break;
+                        case (int)OTHERS.A1BVI: bvi = (ushort)1; break;
                         case (int)OTHERS.A0BVI: bvi = 0; break;
                         case (int)OTHERS.INTAMIN2SP: INTA = 1; SP = SP - 2; break;
                         case (int)OTHERS.A0BEA0BI: aclow = 0; cil = 0; bvi = 0; break;
                     }
-
-                    break;
 
                 case 2:
                     while (BUSY == 1) ;
