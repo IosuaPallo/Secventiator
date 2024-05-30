@@ -21,7 +21,9 @@ namespace Secventiator
         uint stare;
         int f, g;
         int aclow, cil;
-        int INTR; 
+        int INTR;
+        int BUSY;
+        int MREQ;
 
         public Form1()
         {
@@ -125,6 +127,15 @@ namespace Secventiator
                     break;
 
                 case 2:
+                    while (BUSY == 1) ;
+                    MREQ = 1;
+
+                    BUSY = 1;
+                    BUSY = 0;
+
+                    // operatie MEM 
+
+                    stare = 0;
                     break;
                 default:
                     break;
