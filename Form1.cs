@@ -1,11 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Secventiator
@@ -20,8 +13,10 @@ namespace Secventiator
         UInt16[] MEM;
         uint stare;
         int f, g;
-        int aclow, cil;
-        int INTR;
+        int aclow, cil,cIN;
+        int INTR, INTA;
+        int bpo;
+        int cALU, zALU, sALU, vALU;
         int BUSY;
         int MREQ;
 
@@ -122,6 +117,87 @@ namespace Secventiator
                     else
                     {
                         stare = 2;
+                    }
+
+                    switch (operatieALU)
+                    {
+                        case (int)ALU.NONE: break;
+                        case (int)ALU.SBUS: RBUS = SBUS; break;
+                        case (int)ALU.DBUS: RBUS = DBUS; break;
+                        case (int)ALU.ADD: RBUS = (UInt16)(SBUS + DBUS); break;
+                        case (int)ALU.SUB: RBUS = (UInt16)(SBUS - DBUS); break;
+                        case (int)ALU.AND: RBUS = (UInt16)(SBUS & DBUS); break;
+                        case (int)ALU.OR: RBUS = (UInt16)(SBUS | DBUS); break;
+                        case (int)ALU.XOR: RBUS = (UInt16)(SBUS ^ DBUS); break;
+                        case (int)ALU.ASL: RBUS = (UInt16)(SBUS >> DBUS); break;
+                        case (int)ALU.ASR: RBUS = (UInt16)(SBUS << DBUS); break;
+                            RBUS = SBUS;
+                        case (int)ALU.LSR: int x = DBUS;
+                            while (x>0)
+                            {
+                                RBUS= (UInt16) (RBUS >> 1);
+                                RBUS &= 0x7FFF;
+                                x--;
+                            }
+                            break;
+                        case (int)ALU.ROL: RBUS = (UInt16)((UInt16) (SBUS << DBUS) | (UInt16)(SBUS >> (-DBUS & 16))); break;
+                        case (int)ALU.ROR: RBUS = (UInt16)((UInt16)(SBUS >> DBUS) | (UInt16)(SBUS << (-DBUS & 16))); break;
+                        case (int)ALU.RLC: 
+                            int y = DBUS;
+                            RBUS = SBUS;
+                            while (y > 0)
+                            {
+                                cALU = (RBUS & 0x8000); 
+                                RBUS = (UInt16)((SBUS <<1) | (cALU >> 15));
+                                y--;
+                            } break;
+                        case (int)ALU.RRC:
+                            int w = DBUS;
+                            RBUS = SBUS;
+                            while (w > 0)
+                            {
+                                cALU = RBUS & 0x0001;
+                                RBUS = (UInt16)((SBUS >> 1) | (cALU << 15));
+                                w--;
+                            }
+                            break;
+                    }
+                    if (RBUS == 0)
+                    {
+                        zALU = 1;
+                    }
+                    if(RBUS >= 0)
+                    {
+                        sALU = 0;
+                    }
+                    {
+                    else
+                        sALU = 1;
+                    }
+
+                        case (int)OTHERS.NONE: break;
+                        case (int)OTHERS.PLUS2SP: SP = SP + 2; break;
+                        case (int)OTHERS.MIN2SP: SP = SP - 2; break;
+                        case (int)OTHERS.PLUS2PC: PC = PC + 2; break;
+                        case (int)OTHERS.PdCONDa:
+                            FLAGS |= (ushort)(cALU << 3); 
+                            FLAGS |= (ushort)(zALU << 2);   
+                            FLAGS |= (ushort)(sALU << 1);  
+                            FLAGS |= (ushort)vALU; break;
+                        case (int)OTHERS.CinPdCONDa: 
+                            cIN = 1; 
+                            FLAGS |= (ushort)(cALU << 3);
+                            FLAGS |= (ushort)(zALU << 2);
+                            FLAGS |= (ushort)(sALU << 1);
+                        case (int)OTHERS.PdCONDl:
+                            FLAGS |= (ushort)vALU; break;
+                            FLAGS |= (ushort)(zALU << 2);
+                            FLAGS |= (ushort)(sALU << 1);
+                            break;
+                        case (int)OTHERS.A1BVI: bvi = 1; break;
+                        case (int)OTHERS.A0BVI: bvi = 0; break;
+                        case (int)OTHERS.INTAMIN2SP: INTA = 1; SP = SP - 2; break;
+                        case (int)OTHERS.A0BEA0BI: aclow = 0; cil = 0; bvi = 0; break;
                     }
 
                     break;
