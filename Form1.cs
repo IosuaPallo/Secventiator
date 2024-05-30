@@ -224,8 +224,8 @@ namespace Secventiator
         }
 
         private int GetIndex(int index) {
-            int cl1 = IR >> 15 & (IR & 0b0100000000000000) >>14;
-            int cl0 = IR >> 15 & ~((IR & 0b0010000000000000) >> 13);
+            int cl1 = IR >> 15 & (IR & 0b0100000000000000) >>14; //IR15 & IR14
+            int cl0 = IR >> 15 & ~((IR & 0b0010000000000000) >> 13); // IR15& ~IR13
             int index1 = cl1 << 1;
             index1 = index1 + cl0;
             switch(index)
@@ -234,7 +234,7 @@ namespace Secventiator
                     return 0;
                 case 1: return index1;
                 case 2:
-                    return (IR & 0b0000110000000000)>>10;
+                    return (IR & 0b0000110000000000)>>10; // 
                 case 3:
                     return (IR & 0b0000000000110000)>>4; 
                 case 4:
