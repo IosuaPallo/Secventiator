@@ -85,6 +85,14 @@ namespace Secventiator
                         case (int)Secventiator.RBUS.PmMDR: MDR = RBUS; break;
                     }
 
+                    switch (operatieMem)
+                    {
+                        case (int)Secventiator.MEM.NONE: break;
+                        case (int)Secventiator.MEM.IFCH: IR = MEM[ADR]; break;
+                        case (int)Secventiator.MEM.RD: MDR = MEM[ADR]; break;
+                        case (int)Secventiator.MEM.WR: MEM[ADR] = MDR; break;
+                    }
+
                     switch (alteOperatii)
                     {
                         case (int)OTHERS.A1BE0: aclow = 1; break;
