@@ -15,7 +15,7 @@ namespace Secventiator
         int f, g;
         int aclow, cil,cIN;
         int INTR, INTA;
-        int bpo;
+        int bpo=0;
         int cALU, zALU, sALU, vALU;
         int BUSY;
         int MREQ;
@@ -23,12 +23,13 @@ namespace Secventiator
         public Form1()
         {
             InitializeComponent();
+            Sec();
         }
         
         private void Sec()
         {
 
-            while (true)
+            while (bpo == 0)
             {
                 int sursaSBUS = (int)((MIR >> 32) & 0xF);       // Bits 35-32
                 int sursaDBUS = (int)((MIR >> 28) & 0xF);       // Bits 31-28
@@ -43,7 +44,7 @@ namespace Secventiator
                 switch (stare)
                 {
                     case 0:
-                        MIR = MPM[MAR];
+                        MIR = 0;//MIR = MPM[MAR];
                         stare = 1;
                         break;
                     case 1:
@@ -115,14 +116,33 @@ namespace Secventiator
                         {
                             stare = 2;
                         }
-
+                       
                         switch (operatieALU)
                         {
                             case (int)ALU.NONE: break;
                             case (int)ALU.SBUS: RBUS = SBUS; break;
                             case (int)ALU.DBUS: RBUS = DBUS; break;
-                            case (int)ALU.ADD: RBUS = (UInt16)(SBUS + DBUS); break;
-                            case (int)ALU.SUB: RBUS = (UInt16)(SBUS - DBUS); break;
+                            case (int)ALU.ADD:
+                                RBUS = (UInt16)(SBUS + DBUS);
+                                if (SBUS > (UInt16.MaxValue - DBUS))
+                                {
+                                    cALU = 1;
+                                }
+                                if((Int16)SBUS > (Int16.MaxValue - (Int16)DBUS)){
+                                    vALU = 1;
+                                }
+                                 break;
+                            case (int)ALU.SUB:
+                                if (DBUS > SBUS)
+                                {
+                                    cALU = 1;
+                                }
+                                Int16 result =(Int16)((Int16)SBUS - (Int16)DBUS);
+                                if (((Int16)SBUS > 0 && (Int16)DBUS < 0 && result < 0) || ((Int16)SBUS < 0 && (Int16)DBUS > 0 && result > 0))
+                                {
+                                    vALU = 1;
+                                }
+                                RBUS = (UInt16)(SBUS - DBUS); break;
                             case (int)ALU.AND: RBUS = (UInt16)(SBUS & DBUS); break;
                             case (int)ALU.OR: RBUS = (UInt16)(SBUS | DBUS); break;
                             case (int)ALU.XOR: RBUS = (UInt16)(SBUS ^ DBUS); break;
@@ -141,21 +161,25 @@ namespace Secventiator
                             case (int)ALU.ROR: RBUS = (UInt16)((UInt16)(SBUS >> DBUS) | (UInt16)(SBUS << (-DBUS & 16))); break;
                             case (int)ALU.RLC:
                                 int y = DBUS;
+                                int carry1;
                                 RBUS = SBUS;
                                 while (y > 0)
                                 {
+                                    carry1 = cALU;
                                     cALU = (RBUS & 0x8000);
-                                    RBUS = (UInt16)((SBUS << 1) | (cALU >> 15));
+                                    RBUS = (UInt16)((SBUS << 1) | (carry1 >> 15));
                                     y--;
                                 }
                                 break;
                             case (int)ALU.RRC:
                                 int w = DBUS;
+                                int carry2;
                                 RBUS = SBUS;
                                 while (w > 0)
                                 {
+                                    carry2 = cALU;
                                     cALU = RBUS & 0x0001;
-                                    RBUS = (UInt16)((SBUS >> 1) | (cALU << 15));
+                                    RBUS = (UInt16)((SBUS >> 1) | (carry2 << 15));
                                     w--;
                                 }
                                 break;
@@ -163,6 +187,10 @@ namespace Secventiator
                         if (RBUS == 0)
                         {
                             zALU = 1;
+                        }
+                        else
+                        {
+                            zALU = 0;
                         }
                         if (RBUS >= 0)
                         {
@@ -178,6 +206,8 @@ namespace Secventiator
                             case (int)OTHERS.PLUS2SP: SP = (UInt16)(SP + 2); break;
                             case (int)OTHERS.MIN2SP: SP = (UInt16)(SP - 2); break;
                             case (int)OTHERS.PLUS2PC: PC = (UInt16)(PC + 2); break;
+                            case (int)OTHERS.A1BE0: aclow = 1; break;
+                            case (int)OTHERS.A1BE1: cil = 1; break;
                             case (int)OTHERS.PdCONDa:
                                 FLAGS |= (ushort)(cALU << 3);
                                 FLAGS |= (ushort)(zALU << 2);
@@ -197,6 +227,7 @@ namespace Secventiator
                                 break;
                             case (int)OTHERS.A1BVI: bvi = (ushort)1; break;
                             case (int)OTHERS.A0BVI: bvi = 0; break;
+                            case (int)OTHERS.A0BPO: bpo = 1; break;
                             case (int)OTHERS.INTAMIN2SP: INTA = 1; SP = (UInt16)(SP - 2); break;
                             case (int)OTHERS.A0BEA0BI: aclow = 0; cil = 0; bvi = 0; break;
                         }
