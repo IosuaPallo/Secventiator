@@ -237,7 +237,7 @@ namespace Secventiator
                     return 0;
                 case 1: return index1;
                 case 2:
-                    return (IR & 0b0000110000000000)>>10; // 
+                    return (IR >> 10) & 0x07 ; // 
                 case 3:
                     return (IR & 0b0000000000110000)>>4; 
                 case 4:
