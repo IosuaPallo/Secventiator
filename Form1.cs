@@ -19,6 +19,7 @@ namespace Secventiator
         int cALU, zALU, sALU, vALU;
         int BUSY;
         int MREQ;
+        
 
         public Form1()
         {
@@ -31,24 +32,25 @@ namespace Secventiator
 
             while (bpo == 0)
             {
-                int sursaSBUS = (int)((MIR >> 32) & 0xF);       // Bits 35-32
-                int sursaDBUS = (int)((MIR >> 28) & 0xF);       // Bits 31-28
-                int operatieALU = (int)((MIR >> 24) & 0xF);     // Bits 27-24
-                int destinatieRBUS = (int)((MIR >> 20) & 0xF);  // Bits 23-20
-                int operatieMem = (int)((MIR >> 18) & 0x3);     // Bits 19-18
-                int alteOperatii = (int)((MIR >> 14) & 0xF);    // Bits 17-14
-                int succesor = (int)((MIR >> 11) & 0x7);        // Bits 13-11
-                int index = (int)((MIR >> 8) & 0x7);            // Bits 10-8
-                int NTF = (int)((MIR >> 7) & 0x1);              // Bit 7
-                int microAdresaSalt = (int)(MIR & 0x7F);        // Bits 6-0
+                int operatieMem = 0;
                 switch (stare)
                 {
                     case 0:
                         MIR = 0;//MIR = MPM[MAR];
+
                         stare = 1;
                         break;
                     case 1:
-
+                        int sursaSBUS = (int)((MIR >> 32) & 0xF);       // Bits 35-32
+                        int sursaDBUS = (int)((MIR >> 28) & 0xF);       // Bits 31-28
+                        int operatieALU = (int)((MIR >> 24) & 0xF);     // Bits 27-24
+                        int destinatieRBUS = (int)((MIR >> 20) & 0xF);  // Bits 23-20
+                        operatieMem = (int)((MIR >> 18) & 0x3);     // Bits 19-18
+                        int alteOperatii = (int)((MIR >> 14) & 0xF);    // Bits 17-14
+                        int succesor = (int)((MIR >> 11) & 0x7);        // Bits 13-11
+                        int index = (int)((MIR >> 8) & 0x7);            // Bits 10-8
+                        int NTF = (int)((MIR >> 7) & 0x1);              // Bit 7
+                        int microAdresaSalt = (int)(MIR & 0x7F);        // Bits 6-0
                         int bvi = (FLAGS >> 7) & 1; // bit 7
                         int c = (FLAGS >> 3) & 1;   // bit 3
                         int z = (FLAGS >> 2) & 1;   // bit 2
@@ -239,6 +241,7 @@ namespace Secventiator
                        
                         BUSY = 1;
                         BUSY = 0;
+
 
                         switch (operatieMem)
                         {
