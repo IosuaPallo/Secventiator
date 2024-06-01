@@ -88,6 +88,22 @@ namespace Secventiator
                             case (int)Secventiator.RBUS.PmMDR: MDR = RBUS; break;
                         }
 
+                        switch (sursaDBUS)
+                        {
+                            case (int)Secventiator.DBUS.NONE: break;
+                            case (int)Secventiator.DBUS.PdFLAG: DBUS = FLAGS; break;
+                            case (int)Secventiator.DBUS.PdRG: DBUS = RG[(IR >> 6) & 0xF]; break;
+                            case (int)Secventiator.DBUS.PdSP: DBUS = SP; break;
+                            case (int)Secventiator.DBUS.PdT: DBUS = T; break;
+                            case (int)Secventiator.DBUS.PdPC: DBUS = PC; break;
+                            case (int)Secventiator.DBUS.PdIVR: DBUS = IVR; break;
+                            case (int)Secventiator.DBUS.PdADR: DBUS = ADR; break;
+                            case (int)Secventiator.DBUS.PdMDR: DBUS = MDR; break;
+                            case (int)Secventiator.DBUS.PdMDRN: DBUS = (ushort)~MDR; break;
+                            case (int)Secventiator.DBUS.PdIR: DBUS = (ushort)(IR & 0x00FF); break;
+                            case (int)Secventiator.DBUS.Pd0: DBUS = 0; break;
+                            case (int)Secventiator.DBUS.PdMinus1: DBUS = 0xFF; break;
+                        }
 
                         switch (succesor)
                         {
