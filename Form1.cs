@@ -5,17 +5,17 @@ namespace Secventiator
 {
     public partial class Form1 : Form
     {
-        UInt64 MIR, MAR;
-        UInt64[] MPM;
+        UInt64 MIR, MAR=0;
+        UInt64[] MPM = { 0b101110110011100010000000000000000000, 0b100101010011010100000000000000000000, 0b000000000000000000101100000000000000 }; //MDR<-MEM[ADR=0], T<-MDR(=0xFF)+PC(=0), HALT
         UInt16 PC, IR, SP, FLAGS, T, ADR, MDR, IVR;
         UInt16[] RG;
         UInt16 SBUS, DBUS, RBUS;
-        UInt16[] MEM;
+        UInt16[] MEM = { 0xFFFF};
         uint stare;
         int f, g;
         int aclow, cil,cIN;
         int INTR, INTA;
-        int bpo=0;
+        int bpo=1;
         int cALU, zALU, sALU, vALU;
         int BUSY;
         int MREQ;
@@ -25,18 +25,18 @@ namespace Secventiator
         {
             InitializeComponent();
             Sec();
+            int x = 10;
         }
         
         private void Sec()
         {
-
-            while (bpo == 0)
+            int operatieMem = 0;
+            while (bpo == 1)
             {
-                int operatieMem = 0;
                 switch (stare)
                 {
                     case 0:
-                        MIR = 0;//MIR = MPM[MAR];
+                        MIR = MPM[MAR];
 
                         stare = 1;
                         break;
@@ -74,25 +74,11 @@ namespace Secventiator
                             case (int)Secventiator.SBUS.PdMinus1: SBUS = 0xFF; break;
                         }
 
-                        switch (destinatieRBUS)
-                        {
-                            case (int)Secventiator.RBUS.NONE: break;
-                            case (int)Secventiator.RBUS.PmFLAG: FLAGS = RBUS; break;
-                            case (int)Secventiator.RBUS.PmFLAG3: FLAGS = (ushort)(FLAGS & (RBUS & 0x3)); break;
-                            case (int)Secventiator.RBUS.PmRG: RG[IR & 0xF] = RBUS; break;
-                            case (int)Secventiator.RBUS.PmSP: SP = RBUS; break;
-                            case (int)Secventiator.RBUS.PmT: T = RBUS; break;
-                            case (int)Secventiator.RBUS.PmPC: PC = RBUS; break;
-                            case (int)Secventiator.RBUS.PmIVR: IVR = RBUS; break;
-                            case (int)Secventiator.RBUS.PmADR: ADR = RBUS; break;
-                            case (int)Secventiator.RBUS.PmMDR: MDR = RBUS; break;
-                        }
-
                         switch (sursaDBUS)
                         {
                             case (int)Secventiator.DBUS.NONE: break;
                             case (int)Secventiator.DBUS.PdFLAG: DBUS = FLAGS; break;
-                            case (int)Secventiator.DBUS.PdRG: DBUS = RG[(IR >> 6) & 0xF]; break;
+                            case (int)Secventiator.DBUS.PdRG: DBUS = RG[IR & 0xF]; break;
                             case (int)Secventiator.DBUS.PdSP: DBUS = SP; break;
                             case (int)Secventiator.DBUS.PdT: DBUS = T; break;
                             case (int)Secventiator.DBUS.PdPC: DBUS = PC; break;
@@ -105,36 +91,6 @@ namespace Secventiator
                             case (int)Secventiator.DBUS.PdMinus1: DBUS = 0xFF; break;
                         }
 
-                        switch (succesor)
-                        {
-                            case (int)SUCCESOR.STEP: f = NTF; g = 0; break;
-                            case (int)SUCCESOR.JUMPI: f = NTF == 0 ? 1 : 0; g = 1; break;
-                            case (int)SUCCESOR.IFACLOW: f = aclow; g = f ^ NTF; break;
-                            case (int)SUCCESOR.IFCIL: f = cil; g = cil ^ NTF; break;
-                            case (int)SUCCESOR.IFC: f = c; g = c ^ NTF; break;
-                            case (int)SUCCESOR.IFZ: f = z; g = z ^ NTF; break;
-                            case (int)SUCCESOR.IFS: f = s; g = s ^ NTF; break;
-                            case (int)SUCCESOR.IFV: f = v; g = v ^ NTF; break;
-                        }
-
-                        if (g == 1)
-                        {
-                            MAR = (ulong)(microAdresaSalt + GetIndex(index));
-                        }
-                        else
-                        {
-                            MAR++;
-                        }
-
-                        if (operatieMem == (int)Secventiator.MEM.NONE)
-                        {
-                            stare = 0;
-                        }
-                        else
-                        {
-                            stare = 2;
-                        }
-                       
                         switch (operatieALU)
                         {
                             case (int)ALU.NONE: break;
@@ -146,16 +102,17 @@ namespace Secventiator
                                 {
                                     cALU = 1;
                                 }
-                                if((Int16)SBUS > (Int16.MaxValue - (Int16)DBUS)){
+                                if ((Int16)SBUS > (Int16.MaxValue - (Int16)DBUS))
+                                {
                                     vALU = 1;
                                 }
-                                 break;
+                                break;
                             case (int)ALU.SUB:
                                 if (DBUS > SBUS)
                                 {
                                     cALU = 1;
                                 }
-                                Int16 result =(Int16)((Int16)SBUS - (Int16)DBUS);
+                                Int16 result = (Int16)((Int16)SBUS - (Int16)DBUS);
                                 if (((Int16)SBUS > 0 && (Int16)DBUS < 0 && result < 0) || ((Int16)SBUS < 0 && (Int16)DBUS > 0 && result > 0))
                                 {
                                     vALU = 1;
@@ -218,6 +175,21 @@ namespace Secventiator
                         {
                             sALU = 1;
                         }
+
+                        switch (destinatieRBUS)
+                        {
+                            case (int)Secventiator.RBUS.NONE: break;
+                            case (int)Secventiator.RBUS.PmFLAG: FLAGS = RBUS; break;
+                            case (int)Secventiator.RBUS.PmFLAG3: FLAGS = (ushort)(FLAGS & (RBUS & 0xF)); break;
+                            case (int)Secventiator.RBUS.PmRG: RG[IR & 0xF] = RBUS; break;
+                            case (int)Secventiator.RBUS.PmSP: SP = RBUS; break;
+                            case (int)Secventiator.RBUS.PmT: T = RBUS; break;
+                            case (int)Secventiator.RBUS.PmPC: PC = RBUS; break;
+                            case (int)Secventiator.RBUS.PmIVR: IVR = RBUS; break;
+                            case (int)Secventiator.RBUS.PmADR: ADR = RBUS; break;
+                            case (int)Secventiator.RBUS.PmMDR: MDR = RBUS; break;
+                        }
+
                         switch (alteOperatii)
                         {
                             case (int)OTHERS.NONE: break;
@@ -245,10 +217,41 @@ namespace Secventiator
                                 break;
                             case (int)OTHERS.A1BVI: bvi = (ushort)1; break;
                             case (int)OTHERS.A0BVI: bvi = 0; break;
-                            case (int)OTHERS.A0BPO: bpo = 1; break;
+                            case (int)OTHERS.A0BPO: bpo = 0; break;
                             case (int)OTHERS.INTAMIN2SP: INTA = 1; SP = (UInt16)(SP - 2); break;
                             case (int)OTHERS.A0BEA0BI: aclow = 0; cil = 0; bvi = 0; break;
                         }
+
+                        switch (succesor)
+                        {
+                            case (int)SUCCESOR.STEP: f = NTF; g = 0; break;
+                            case (int)SUCCESOR.JUMPI: f = NTF == 0 ? 1 : 0; g = 1; break;
+                            case (int)SUCCESOR.IFACLOW: f = aclow; g = f ^ NTF; break;
+                            case (int)SUCCESOR.IFCIL: f = cil; g = cil ^ NTF; break;
+                            case (int)SUCCESOR.IFC: f = c; g = c ^ NTF; break;
+                            case (int)SUCCESOR.IFZ: f = z; g = z ^ NTF; break;
+                            case (int)SUCCESOR.IFS: f = s; g = s ^ NTF; break;
+                            case (int)SUCCESOR.IFV: f = v; g = v ^ NTF; break;
+                        }
+
+                        if (g == 1)
+                        {
+                            MAR = (ulong)(microAdresaSalt + GetIndex(index));
+                        }
+                        else
+                        {
+                            MAR++;
+                        }
+
+                        if (operatieMem == (int)Secventiator.MEM.NONE)
+                        {
+                            stare = 0;
+                        }
+                        else
+                        {
+                            stare = 2;
+                        }
+              
                         break;
 
                     case 2:
@@ -306,8 +309,7 @@ namespace Secventiator
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            IR = 0b0011111100000000;
-            MessageBox.Show(GetIndex(6).ToString());
+       
         }
     }
 }
