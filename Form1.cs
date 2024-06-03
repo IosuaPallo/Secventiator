@@ -209,9 +209,9 @@ namespace Secventiator
                                 FLAGS |= (ushort)(cALU << 3);
                                 FLAGS |= (ushort)(zALU << 2);
                                 FLAGS |= (ushort)(sALU << 1);
+                                FLAGS |= (ushort)vALU;
                                 break;
                             case (int)OTHERS.PdCONDl:
-                                FLAGS |= (ushort)vALU; break;
                                 FLAGS |= (ushort)(zALU << 2);
                                 FLAGS |= (ushort)(sALU << 1);
                                 break;
